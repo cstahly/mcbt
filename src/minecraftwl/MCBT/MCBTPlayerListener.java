@@ -1,5 +1,6 @@
-package minecraftwl.MCBT
+package minecraftwl.MCBT;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerChatEvent;
@@ -23,7 +24,7 @@ public class MCBTPlayerListener extends PlayerListener {
     public void onPlayerJoin(PlayerEvent event)
     {
     	
-    	event.getPlayer().sendMessage("Plugin test");
+    	event.getPlayer().sendMessage(ChatColor.AQUA + "[MCBT] Plugin test");
     }
     
 }

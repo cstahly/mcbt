@@ -1,4 +1,4 @@
-package minecraftwl.MCBT
+package minecraftwl.MCBT;
 
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
