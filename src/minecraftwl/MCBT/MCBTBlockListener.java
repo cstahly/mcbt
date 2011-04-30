@@ -27,9 +27,9 @@ public class MCBTBlockListener extends BlockListener {
     	int id = -1;
     	
     	try {
-    		id = getPlayerID(p.getName());		
-    		updatePlayerBreaks(id);
-    		updateGlobalBreaks();
+    		id = plugin.sqlInterface.getPlayerID(p.getName());		
+    		plugin.sqlInterface.updatePlayerBreaks(id);
+    		plugin.sqlInterface.updateGlobalBreaks();
     	}
     	catch(Exception e)
     	{
@@ -43,9 +43,9 @@ public class MCBTBlockListener extends BlockListener {
     	int id = -1;
     	
     	try {
-    		id = getPlayerID(p.getName());		
-    		updatePlayerPlaces(id);
-    		updateGlobalPlaces();
+    		id = plugin.sqlInterface.getPlayerID(p.getName());		
+    		plugin.sqlInterface.updatePlayerPlaces(id);
+    		plugin.sqlInterface.updateGlobalPlaces();
     	}
     	catch(Exception e)
     	{
@@ -53,90 +53,4 @@ public class MCBTBlockListener extends BlockListener {
     	}
     }
     
-    private int getPlayerID(String player) throws Exception {
-    	int id = -1;
-    	
-    	Class.forName("org.sqlite.JDBC");
-        Connection conn =
-          DriverManager.getConnection("jdbc:sqlite:mcbt.db");
-        
-        Statement stat = conn.createStatement();
-        
-        ResultSet rs = stat.executeQuery("select ID from people where name = '" + player + "';");
-        
-        while (rs.next()) {
-          id = rs.getInt("ID");
-        }
-        
-        rs.close();
-        
-        if(id == -1) {
-        	stat.executeQuery("insert into people(name) values('" + player + "');");
-        
-        	rs = stat.executeQuery("select ID from people where name = '" + player + "';");
-            
-            while (rs.next()) {
-              id = rs.getInt("ID");
-            }
-            
-            rs.close();
-        }
-        
-        conn.close();
-        
-        return id;
-    }
-    
-    private void updatePlayerBreaks(int id) throws Exception {
-    	
-    	Class.forName("org.sqlite.JDBC");
-        Connection conn =
-          DriverManager.getConnection("jdbc:sqlite:mcbt.db");
-        
-        Statement stat = conn.createStatement();
-        
-        stat.executeQuery("update playerBreaks set count = count + 1 where ID = '" + id + "';");
-        
-        conn.close();
-    }
-
-    private void updatePlayerPlaces(int id) throws Exception {
-    	
-    	Class.forName("org.sqlite.JDBC");
-        Connection conn =
-          DriverManager.getConnection("jdbc:sqlite:mcbt.db");
-        
-        Statement stat = conn.createStatement();
-        
-        stat.executeQuery("update places set count = count + 1 where ID = '" + id + "';");
-        
-        conn.close();
-        
-    }
-    
-    private void updateGlobalBreaks() throws Exception {
-    	
-    	Class.forName("org.sqlite.JDBC");
-        Connection conn =
-          DriverManager.getConnection("jdbc:sqlite:mcbt.db");
-        
-        Statement stat = conn.createStatement();
-        
-        stat.executeQuery("update breaks set count = count + 1 where ID = 0';");
-        
-        conn.close();
-    }
-    
-    private void updateGlobalPlaces() throws Exception {
-    	
-    	Class.forName("org.sqlite.JDBC");
-        Connection conn =
-          DriverManager.getConnection("jdbc:sqlite:mcbt.db");
-        
-        Statement stat = conn.createStatement();
-        
-        stat.executeQuery("update places set count = count + 1 where ID = 0';");
-        
-        conn.close();
-    }
 }

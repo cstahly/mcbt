@@ -23,8 +23,10 @@ public class MCBTPlayerListener extends PlayerListener {
 
     public void onPlayerJoin(PlayerEvent event)
     {
-    	
     	event.getPlayer().sendMessage(ChatColor.AQUA + "[MCBT] Plugin test");
+    	// TODO: get player ID, put in hash map
     }
+    
+    // TODO: on player exit, remove ID from hash map
     
 }
