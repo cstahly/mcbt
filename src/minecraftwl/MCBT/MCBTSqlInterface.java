@@ -22,12 +22,6 @@ public class MCBTSqlInterface {
 	//   Opens/creates database
 	//   Populates preprocessed SQL
 	//
-	// Will throw for permission/other filesystem problems.
-	//  Stack trace is enough info, I'm sure...
-	//
-	// Will keep the connection open (and the database file r/w locked) for the entire server session.
-	//  Should be the only consumer of the database, so should be okay?
-	//
 	
 	protected void init(String filename) throws Exception {
 
@@ -48,18 +42,11 @@ public class MCBTSqlInterface {
 		
 	    if (createNewDB) {
 	    	System.out.println("Database doesn't exist, populating new one...");
-	    	Statement stat = _conn.createStatement();
-	        stat.execute("create table player(ID integer PRIMARY KEY, name text);");
-	        stat.execute("create table places(ID integer, count BigInt, FOREIGN KEY (ID) REFERENCES player(ID));");
-	        stat.execute("create table breaks(ID integer, count BigInt, FOREIGN KEY (ID) REFERENCES player(ID));");
-
-	        stat.execute("insert into player(ID, name) values(0, 'global');"); // I hope nobody named "global" joins
-        	stat.execute("insert into places(ID, count) values(0,0);");
-        	stat.execute("insert into breaks(ID, count) values(0,0);");
+	    	createDatabase();
 	    }
 	    
 	    // Create statements
-	    _ps_getID = _conn.prepareStatement("select ID from player where name = ?;");
+	    _ps_getID = _conn.prepareStatement("select ID from player where name = ? and reserved = 0;");
 	    _ps_updateBreaks = _conn.prepareStatement("update breaks set count = count + 1 where ID = ?;");
 	    _ps_updatePlaces = _conn.prepareStatement("update places set count = count + 1 where ID = ?;");
 	}
@@ -92,27 +79,15 @@ public class MCBTSqlInterface {
         return id;
     }
     
-    protected void updatePlayerBreaks(int id) throws Exception {
+    protected void updateBreaks(int id) throws Exception {
     	// update breaks set count = count + 1 where ID = '?';
     	_ps_updateBreaks.setInt(1, id);
     	_ps_updateBreaks.execute();
     }
 
-    protected void updatePlayerPlaces(int id) throws Exception {
+    protected void updatePlaces(int id) throws Exception {
     	// update places set count = count + 1 where ID = '?';
     	_ps_updatePlaces.setInt(1, id);
-    	_ps_updatePlaces.execute();
-    }
-    
-    protected void updateGlobalBreaks() throws Exception {
-    	// update breaks set count = count + 1 where ID = '0';
-    	_ps_updateBreaks.setInt(1, 0);
-    	_ps_updateBreaks.execute();        
-    }
-    
-    protected void updateGlobalPlaces() throws Exception {
-    	// update places set count = count + 1 where ID = '0';
-    	_ps_updatePlaces.setInt(1, 0);
     	_ps_updatePlaces.execute();
     }
     
@@ -121,7 +96,7 @@ public class MCBTSqlInterface {
     	int id=-1;
     	
     	Statement stat = _conn.createStatement();
-    	stat.execute("insert into player(name) values('" + player + "');");
+    	stat.execute("insert into player(name,reserved) values('" + player + "', 0);");
     	
     	_ps_getID.setString(1, player);
     	ResultSet rs = _ps_getID.executeQuery();
@@ -143,6 +118,23 @@ public class MCBTSqlInterface {
         stat.close();
         return id;
 
+    }
+    
+    private void createDatabase() throws SQLException {
+    	Statement stat = _conn.createStatement();
+        stat.execute("create table player(ID integer PRIMARY KEY, name text, reserved integer);");
+        stat.execute("create table places(ID integer, count BigInt, FOREIGN KEY (ID) REFERENCES player(ID));");
+        stat.execute("create table breaks(ID integer, count BigInt, FOREIGN KEY (ID) REFERENCES player(ID));");
+
+        stat.execute("insert into player(ID, name, reserved) values(0, 'all_players', 1);");	        
+        stat.execute("insert into places(ID, count) values(0,0);");
+    	stat.execute("insert into breaks(ID, count) values(0,0);");
+
+        stat.execute("insert into player(ID, name, reserved) values(1, 'explosion', 1);");
+    	stat.execute("insert into breaks(ID, count) values(1,0);");
+
+        stat.execute("insert into player(ID, name, reserved) values(2, 'fire', 1);");
+    	stat.execute("insert into breaks(ID, count) values(2,0);");
     }
 
 }

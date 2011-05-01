@@ -8,7 +8,6 @@ import org.bukkit.event.Event;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.PluginManager;
-import java.io.File;
 
 /**
  * MCBT plugin for Bukkit
@@ -16,8 +15,9 @@ import java.io.File;
  * @author none
  */
 public class MCBT extends JavaPlugin {
-    private final MCBTPlayerListener playerListener = new MCBTPlayerListener(this);
+    private final MCBTPlayerListener playerListener = new MCBTPlayerListener();
     private final MCBTBlockListener blockListener = new MCBTBlockListener(this);
+    private final MCBTEntityListener entityListener = new MCBTEntityListener(this);
     private final HashMap<Player, Boolean> debugees = new HashMap<Player, Boolean>();
 
     protected final MCBTSqlInterface sqlInterface = new MCBTSqlInterface();
@@ -28,9 +28,6 @@ public class MCBT extends JavaPlugin {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
-        // EXAMPLE: Custom code, here we just output some info so we can check all is well
-        System.out.println("Goodbye world!");
     }
 
     public void onEnable() {
@@ -47,7 +44,9 @@ public class MCBT extends JavaPlugin {
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvent(Event.Type.PLAYER_JOIN, playerListener, Priority.Normal, this);
         pm.registerEvent(Event.Type.BLOCK_BREAK, blockListener, Priority.Normal, this);
+        pm.registerEvent(Event.Type.BLOCK_BURN,  blockListener, Priority.Normal, this);
         pm.registerEvent(Event.Type.BLOCK_PLACE, blockListener, Priority.Normal, this);
+        pm.registerEvent(Event.Type.ENTITY_EXPLODE, entityListener, Priority.Normal, this);
 
         // Register our commands
         //getCommand("pos").setExecutor(new MCBTPosCommand(this));

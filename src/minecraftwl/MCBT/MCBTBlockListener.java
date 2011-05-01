@@ -1,14 +1,10 @@
 package minecraftwl.MCBT;
 
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockListener;
-import org.bukkit.event.block.BlockPhysicsEvent;
-import java.sql.*;
 
 /**
  * MCBT block listener
@@ -20,6 +16,19 @@ public class MCBTBlockListener extends BlockListener {
     public MCBTBlockListener(final MCBT plugin) {
         this.plugin = plugin;
     }
+    
+    //put all Block related code here
+    public void onBlockBurn(BlockBurnEvent event) {
+
+    	try {
+        	//TODO: get rid of magic number
+    		plugin.sqlInterface.updateBreaks(2/*fire*/);
+    	}
+    	catch(Exception e)
+    	{
+    		System.out.println(e.toString());
+    	}
+    }
 
     //put all Block related code here
     public void onBlockBreak(BlockBreakEvent event) {
@@ -28,8 +37,10 @@ public class MCBTBlockListener extends BlockListener {
     	
     	try {
     		id = plugin.sqlInterface.getPlayerID(p.getName());		
-    		plugin.sqlInterface.updatePlayerBreaks(id);
-    		plugin.sqlInterface.updateGlobalBreaks();
+    		plugin.sqlInterface.updateBreaks(id);
+    		
+        	//TODO: get rid of magic number
+    		plugin.sqlInterface.updateBreaks(0/*global*/);
     	}
     	catch(Exception e)
     	{
@@ -44,8 +55,10 @@ public class MCBTBlockListener extends BlockListener {
     	
     	try {
     		id = plugin.sqlInterface.getPlayerID(p.getName());		
-    		plugin.sqlInterface.updatePlayerPlaces(id);
-    		plugin.sqlInterface.updateGlobalPlaces();
+    		plugin.sqlInterface.updatePlaces(id);
+    		
+        	//TODO: get rid of magic number
+    		plugin.sqlInterface.updatePlaces(0/*global*/);
     	}
     	catch(Exception e)
     	{
