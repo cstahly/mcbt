@@ -1,5 +1,6 @@
 package minecraftwl.MCBT;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Priority;
@@ -21,14 +22,12 @@ public class MCBT extends JavaPlugin {
 
     protected final MCBTSqlInterface sqlInterface = new MCBTSqlInterface();
     
-    // NOTE: There should be no need to define a constructor any more for more info on moving from
-    // the old constructor see:
-    // http://forums.bukkit.org/threads/too-long-constructor.5032/
-    
     public void onDisable() {
-        // TODO: Place any custom disable code here
-
-        // NOTE: All registered events are automatically unregistered when a plugin is disabled
+    	try {
+			sqlInterface.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 
         // EXAMPLE: Custom code, here we just output some info so we can check all is well
         System.out.println("Goodbye world!");

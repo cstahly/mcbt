@@ -19,12 +19,10 @@ public class MCBTPlayerListener extends PlayerListener {
         plugin = instance;
     }
 
-    //Insert Player related code here
-
     public void onPlayerJoin(PlayerEvent event)
     {
     	event.getPlayer().sendMessage(ChatColor.AQUA + "[MCBT] Plugin test");
-    	// TODO: get player ID, put in hash map
+    	// TODO: get player ID, put in hash map.  Perhaps doing the lookup in sql is not too much slower than hash map?
     }
     
     // TODO: on player exit, remove ID from hash map
