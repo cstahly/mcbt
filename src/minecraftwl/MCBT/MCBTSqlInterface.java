@@ -51,12 +51,12 @@ public class MCBTSqlInterface {
 	    
 	    // Create statements
 	    _ps_getID              = _conn.prepareStatement("select ID from player where name = ? and reserved = 0;");
-	    _ps_updateBreaks       = _conn.prepareStatement("update breaks set count = count + 1 where ID = ?;");
-	    _ps_updatePlaces       = _conn.prepareStatement("update places set count = count + 1 where ID = ?;");
-	    _ps_getCounts          = _conn.prepareStatement("select (blocksBroken, blocksBurned, blocksExploded, blockPlaceed) FROM players where playerName = ?;");
-	    _ps_storeCurrentCounts = _conn.prepareStatement("update players set blocksBroken = ?, set blocksBurned = ?, set blocksExploded = ?, set blockPlaced = ? WHERE playerName = ? and reserved = 0;");
+	    _ps_updateBreaks       = _conn.prepareStatement("UPDATE breaks SET count = count + 1 where ID = ?;");
+	    _ps_updatePlaces       = _conn.prepareStatement("UPDATE places SET count = count + 1 where ID = ?;");
+	    _ps_getCounts          = _conn.prepareStatement("SELECT blocksBroken, blocksBurned, blocksExploded, blocksPlaced FROM player where name = ?;");
+	    _ps_storeCurrentCounts = _conn.prepareStatement("UPDATE player SET blocksBroken = ?, blocksBurned = ?, blocksExploded = ?, blocksPlaced = ? WHERE name = ? and reserved = 0;");
 	    _ps_getBroken		   = _conn.prepareStatement("SELECT count FROM breaks WHERE ID = ?;");
-	    _ps_getPlaced		   = _conn.prepareStatement("SELECT count FROM placed WHERE ID = ?;");
+	    _ps_getPlaced		   = _conn.prepareStatement("SELECT count FROM places WHERE ID = ?;");
 	}
 	
 	protected void close() throws SQLException {
@@ -134,61 +134,78 @@ public class MCBTSqlInterface {
     
     private void createDatabase() throws SQLException {
     	Statement stat = _conn.createStatement();
-    	System.out.println("a");
-        stat.execute("create table player(ID integer PRIMARY KEY, name text, reserved integer, blocksBroken BigInt DEFAULT 0, blocksBurned BigInt DEFAULT 0, blocksExploded BigInt DEFAULT 0, blocksPlaced BigInt DEFAULT 0);");
-        System.out.println("b");
+    	stat.execute("create table player(ID integer PRIMARY KEY, name text, reserved integer, blocksBroken BigInt DEFAULT 0, blocksBurned BigInt DEFAULT 0, blocksExploded BigInt DEFAULT 0, blocksPlaced BigInt DEFAULT 0);");
         stat.execute("create table places(ID integer, count BigInt, FOREIGN KEY (ID) REFERENCES player(ID));");
-        System.out.println("c");
         stat.execute("create table breaks(ID integer, count BigInt, FOREIGN KEY (ID) REFERENCES player(ID));");
 
-        System.out.println("d");
         stat.execute("insert into player(ID, name, reserved) values(0, 'all_players', 1);");	        
-        System.out.println("e");
         stat.execute("insert into places(ID, count) values(0,0);");
-        System.out.println("f");
         stat.execute("insert into breaks(ID, count) values(0,0);");
 
-        System.out.println("g");
         stat.execute("insert into player(ID, name, reserved) values(1, 'explosion', 1);");
-        System.out.println("h");
         stat.execute("insert into breaks(ID, count) values(1,0);");
 
-        System.out.println("i");
         stat.execute("insert into player(ID, name, reserved) values(2, 'fire', 1);");
-        System.out.println("j");
         stat.execute("insert into breaks(ID, count) values(2,0);");
     }
 
     public MCBTCount getCount(String playerName) throws SQLException {
     	
+    	//Does the player exist?
+    	try {
+			getPlayerID(playerName);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
     	MCBTCount counts = new MCBTCount(0L,0L,0L,0L);
     	
     	_ps_getCounts.setString(1, playerName);
-    	_ps_getCounts.execute();
     	
-    	ResultSet rs = _ps_getID.executeQuery();
+    	ResultSet rs = _ps_getCounts.executeQuery();
     	
-        counts.blocksBroken   = rs.getLong("blocksBroken") - getBroken(0);
-        counts.blocksBurned   = rs.getLong("blocksBurned") - getPlaced(0);
-        counts.blocksExploded = rs.getLong("blocksExploded") - getBroken(1);
-        counts.blocksPlaced   = rs.getLong("blocksPlaced") - getBroken(2);
+    	rs.next();
+    	
+        counts.blocksBroken   = getBroken(0) - rs.getLong("blocksBroken");
+        counts.blocksBurned   = getPlaced(0) - rs.getLong("blocksBurned");
+        counts.blocksExploded = getBroken(1) - rs.getLong("blocksExploded");
+        counts.blocksPlaced   = getBroken(2) - rs.getLong("blocksPlaced");
+        
+        rs.close();
         
     	return counts;
     
     }
     
     public Long getBroken(int ID) throws SQLException{
+    	
     	_ps_getBroken.setInt(1, ID);
+    	
     	ResultSet rs = _ps_getBroken.executeQuery();
     	
-    	return rs.getLong("count");
+    	rs.next();
+    	
+    	Long num = rs.getLong("count");
+    	
+    	rs.close();
+    	
+    	return num;
     }
     
     public Long getPlaced(int ID) throws SQLException{
+    	
     	_ps_getPlaced.setInt(1, ID);
+    	
     	ResultSet rs = _ps_getPlaced.executeQuery();
     	
-    	return rs.getLong("count");
+    	rs.next();
+    	
+    	Long num = rs.getLong("count");
+    	
+    	rs.close();
+    	
+    	return num;
     }
     
     public void storeCurrentCount(String playerName) throws SQLException {
