@@ -15,7 +15,7 @@ import org.bukkit.plugin.PluginManager;
  * @author none
  */
 public class MCBT extends JavaPlugin {
-    private final MCBTPlayerListener playerListener = new MCBTPlayerListener();
+    private final MCBTPlayerListener playerListener = new MCBTPlayerListener(this);
     private final MCBTBlockListener blockListener = new MCBTBlockListener(this);
     private final MCBTEntityListener entityListener = new MCBTEntityListener(this);
     private final HashMap<Player, Boolean> debugees = new HashMap<Player, Boolean>();
