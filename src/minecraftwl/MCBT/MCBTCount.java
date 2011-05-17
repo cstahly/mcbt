@@ -16,10 +16,10 @@ public class MCBTCount {
 	}
 
 	public String toString() {
-		return blocksBroken.toString()  + " blocks broken, " +
-			   blocksBurned + " blocks burned, " +
-			   blocksExploded.toString() + " blocks exploded, and " + 
-			   blocksPlaced + " blocks placed.";
+		return blocksBroken.toString()  + " blocks broken\n" +
+			   " - " + blocksBurned     + " burned\n" +
+			   " - " + blocksExploded   + " exploded\n" + 
+			   "But N unique players placed " + blocksPlaced + " blocks.";
 	}
 	
 }

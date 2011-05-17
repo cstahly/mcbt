@@ -23,7 +23,11 @@ public class MCBTPlayerListener extends PlayerListener {
 			
 			MCBTCount count = plugin.sqlInterface.getCount(event.getPlayer().getName());
 			
-			event.getPlayer().sendMessage(ChatColor.AQUA + "[MCBT] " + count);
+			event.getPlayer().sendMessage(ChatColor.AQUA.toString() + "Previously on MineCraft-WL.com: ");
+		    event.getPlayer().sendMessage(ChatColor.AQUA.toString() + " - " + count.blocksBroken + " blocks broken");
+		    event.getPlayer().sendMessage(ChatColor.AQUA.toString() + " - " + count.blocksBurned + " burned");
+		    event.getPlayer().sendMessage(ChatColor.RED.toString() + " - " + count.blocksExploded + " exploded");
+		    event.getPlayer().sendMessage(ChatColor.GREEN.toString() + "But #TODO# unique players placed " + count.blocksExploded + " blocks");
 		    
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block

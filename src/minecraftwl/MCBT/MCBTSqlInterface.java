@@ -164,13 +164,11 @@ public class MCBTSqlInterface {
     	_ps_getCounts.setString(1, playerName);
     	
     	ResultSet rs = _ps_getCounts.executeQuery();
-    	
-    	rs.next();
-    	
+    	  	
         counts.blocksBroken   = getBroken(0) - rs.getLong("blocksBroken");
-        counts.blocksBurned   = getPlaced(0) - rs.getLong("blocksBurned");
+        counts.blocksBurned   = getBroken(2) - rs.getLong("blocksBurned");
         counts.blocksExploded = getBroken(1) - rs.getLong("blocksExploded");
-        counts.blocksPlaced   = getBroken(2) - rs.getLong("blocksPlaced");
+        counts.blocksPlaced   = getPlaced(0) - rs.getLong("blocksPlaced");
         
         rs.close();
         
@@ -183,8 +181,6 @@ public class MCBTSqlInterface {
     	_ps_getBroken.setInt(1, ID);
     	
     	ResultSet rs = _ps_getBroken.executeQuery();
-    	
-    	rs.next();
     	
     	Long num = rs.getLong("count");
     	
@@ -199,8 +195,6 @@ public class MCBTSqlInterface {
     	
     	ResultSet rs = _ps_getPlaced.executeQuery();
     	
-    	rs.next();
-    	
     	Long num = rs.getLong("count");
     	
     	rs.close();
@@ -211,9 +205,9 @@ public class MCBTSqlInterface {
     public void storeCurrentCount(String playerName) throws SQLException {
     	
 		_ps_storeCurrentCounts.setLong(1, getBroken(0));  //Broken
-    	_ps_storeCurrentCounts.setLong(2, getPlaced(0));  //Burned     
+    	_ps_storeCurrentCounts.setLong(2, getBroken(2));  //Burned     
     	_ps_storeCurrentCounts.setLong(3, getBroken(1));  //Exploded
-    	_ps_storeCurrentCounts.setLong(4, getBroken(2));  //Placed
+    	_ps_storeCurrentCounts.setLong(4, getPlaced(0));  //Placed
     	_ps_storeCurrentCounts.setString(5, playerName);
     	
     	_ps_storeCurrentCounts.execute();
